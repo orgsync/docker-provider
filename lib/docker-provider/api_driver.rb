@@ -84,7 +84,7 @@ module VagrantPlugins
           :Privileged => params[:privileged],
           :PublishAllPorts => false
         }
-        data[:Hostname] = params.fetch(:name)
+        data[:Hostname] = params.fetch(:hostname)
         forward = ['22'] + Array(params[:ports]).map { |mapping| mapping.to_s }
         forward.compact!
         data[:PortSpecs] = forward
