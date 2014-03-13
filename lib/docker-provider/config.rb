@@ -1,3 +1,5 @@
+require 'docker'
+
 module VagrantPlugins
   module DockerProvider
     class Config < Vagrant.plugin("2", :config)
@@ -16,10 +18,7 @@ module VagrantPlugins
       def finalize!
         @cmd        = [] if @cmd == UNSET_VALUE
         @privileged = false if @privileged == UNSET_VALUE
-
-        if @socket == UNSET_VALUE && docker_host = ENV['DOCKER_HOST']
-          @socket = docker_host
-        end
+        @socket     = ::Docker.url
       end
 
       def validate(machine)
