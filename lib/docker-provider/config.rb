@@ -38,6 +38,27 @@ module VagrantPlugins
         { "docker-provider" => errors }
       end
 
+      def create_params(env)
+        machine = env[:machine]
+
+        container_name = "#{env[:root_path].basename.to_s}_#{machine.name}"
+        container_name.gsub!(/[^-a-z0-9_]/i, "")
+        container_name << "_#{Time.now.to_i}"
+
+        {
+          image:      image,
+          cmd:        cmd,
+          ports:      env[:forwarded_ports].map do |fp|
+                        # TODO: Support for the protocol argument
+                        "#{fp[:host]}:#{fp[:guest]}"
+                      end.compact,
+          name:       container_name,
+          hostname:   machine.config.vm.hostname,
+          volumes:    volumes,
+          privileged: privileged
+        }
+      end
+
       private
 
       def using_nfs?(machine)
