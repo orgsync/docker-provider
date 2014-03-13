@@ -58,7 +58,7 @@ module VagrantPlugins
         inspect_container(cid)['HostConfig']['Privileged']
       end
 
-      def start(cid)
+      def start(cid, params = {})
         unless running?(cid)
           execute('docker', 'start', cid)
           # This resets the cached information we have around, allowing `vagrant reload`s

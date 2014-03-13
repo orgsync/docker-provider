@@ -12,7 +12,9 @@ module VagrantPlugins
       end
 
       def create(params)
-        raise "TODO: creating with params #{params.inspect}!"
+        config = create_container_config(params)
+        container = ::Docker::Container.create(config, @api)
+        container.id
       end
 
       def state(cid)
@@ -39,8 +41,9 @@ module VagrantPlugins
         inspect_container(cid)['HostConfig']['Privileged']
       end
 
-      def start(cid)
-        container(cid).start! if created?(cid)
+      def start(cid, params = {})
+        config = create_container_config(params)
+        container(cid).start!(config) if created?(cid)
       end
 
       def stop(cid)
@@ -60,6 +63,7 @@ module VagrantPlugins
       end
 
       def docker_bridge_ip
+        # TODO: not sure what to do here...  I see its only used for NFS.
         raise "TODO: docker_bridge_ip"
       end
 
@@ -67,6 +71,33 @@ module VagrantPlugins
 
       def container(cid)
         ::Docker::Container.get(cid, nil, @api)
+      end
+
+      # TODO: mostly yanked from `kitchen-docker`
+      # https://github.com/portertech/kitchen-docker/blob/1c46c6054267214b0c241675321bef7436abd090/lib/kitchen/driver/docker.rb#L127-L151
+      def create_container_config(params)
+        data = {
+          :Cmd => Array(params.fetch(:cmd)),
+          :Image => params.fetch(:image),
+          :AttachStdout => true,
+          :AttachStderr => true,
+          :Privileged => params[:privileged],
+          :PublishAllPorts => false
+        }
+        data[:Hostname] = params.fetch(:name)
+        forward = ['22'] + Array(params[:ports]).map { |mapping| mapping.to_s }
+        forward.compact!
+        data[:PortSpecs] = forward
+        data[:PortBindings] = forward.inject({}) do |bindings, mapping|
+          guest_port, host_port = mapping.split(':').reverse
+          bindings["#{guest_port}/tcp"] = [{
+            :HostIp => '',
+            :HostPort => host_port || ''
+          }]
+          bindings
+        end
+        data[:Volumes] = Hash[Array(params[:volumes]).map { |volume| [volume, {}] }]
+        data
       end
 
     end
