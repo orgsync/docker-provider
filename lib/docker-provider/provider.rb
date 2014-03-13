@@ -32,15 +32,17 @@ module VagrantPlugins
         return nil if state == :not_created
 
         network = @driver.inspect_container(@machine.id)['NetworkSettings']
-        ip      = network['IPAddress']
+        ssh_binding = network['Ports']['22/tcp'].first
+        ip = ssh_binding['HostIp']
+        port = ssh_binding['HostPort']
 
         # If we were not able to identify the container's IP, we return nil
         # here and we let Vagrant core deal with it ;)
-        return nil unless ip
+        return nil unless ip && port
 
         {
           :host => ip,
-          :port => @machine.config.ssh.guest_port
+          :port => port
         }
       end
 
