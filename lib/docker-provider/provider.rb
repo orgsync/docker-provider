@@ -1,3 +1,4 @@
+require_relative 'api_driver'
 require_relative 'driver'
 require_relative 'action'
 
@@ -9,7 +10,12 @@ module VagrantPlugins
       def initialize(machine)
         @logger  = Log4r::Logger.new("vagrant::provider::docker")
         @machine = machine
-        @driver  = Driver.new
+        @driver  = case machine.provider_config.driver
+        when :cli then Driver.new
+        when :api then ApiDriver.new(machine.provider_config.socket)
+        # should never get here...
+        else raise "Unknown driver type of #{machine.provider_config.driver}"
+        end
       end
 
       # @see Vagrant::Plugin::V2::Provider#action
