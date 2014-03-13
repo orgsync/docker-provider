@@ -57,10 +57,12 @@ PATH
   remote: .
   specs:
     docker-provider (0.1.0)
+      docker-api (~> 1.8.2)
 
 GEM
   remote: https://rubygems.org/
   specs:
+    archive-tar-minitar (0.5.2)
     celluloid (0.15.2)
       timers (~> 1.1.0)
     celluloid-io (0.15.0)
@@ -70,7 +72,12 @@ GEM
       ffi (~> 1.0, >= 1.0.11)
     coderay (1.1.0)
     diff-lcs (1.2.5)
+    docker-api (1.8.4)
+      archive-tar-minitar
+      excon (>= 0.28)
+      json
     erubis (2.7.0)
+    excon (0.32.1)
     ffi (1.9.3)
     formatador (0.2.4)
     guard (2.5.1)
@@ -83,6 +90,7 @@ GEM
       guard (~> 2.1)
       rspec (>= 2.14, < 4.0)
     i18n (0.6.9)
+    json (1.8.1)
     listen (2.6.1)
       celluloid (>= 0.15.2)
       celluloid-io (>= 0.15.0)
