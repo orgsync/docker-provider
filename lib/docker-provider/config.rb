@@ -48,7 +48,7 @@ module VagrantPlugins
         {
           image:      image,
           cmd:        cmd,
-          ports:      env[:forwarded_ports].map do |fp|
+          ports:      (env[:forwarded_ports] || []).map do |fp|
                         # TODO: Support for the protocol argument
                         "#{fp[:host]}:#{fp[:guest]}"
                       end.compact,
