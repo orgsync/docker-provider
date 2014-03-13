@@ -16,43 +16,57 @@ module VagrantPlugins
       end
 
       def state(cid)
-        raise "TODO: State for #{cid}"
+        if created?(cid)
+          if running?(cid)
+            :running
+          else
+            :stopped
+          end
+        else
+          :not_created
+        end
       end
 
       def created?(cid)
-        raise "TODO: Created? for #{cid}"
+        all_containers.include?(cid)
       end
 
       def running?(cid)
-        raise "TODO: running? for #{cid}"
+        inspect_container(cid)['State']['Running']
       end
 
       def privileged?(cid)
-        raise "TODO: privaliged? for #{cid}"
+        inspect_container(cid)['HostConfig']['Privileged']
       end
 
       def start(cid)
-        raise "TODO: start for #{cid}"
+        container(cid).start! if created?(cid)
       end
 
       def stop(cid)
-        raise "TODO: stop for #{cid}"
+        container(cid).stop! if running?(cid)
       end
 
       def rm(cid)
-        raise "TODO: rm for #{cid}"
+        container(cid).remove
       end
 
       def inspect_container(cid)
-        raise "TODO: inspect_container for #{cid}"
+        container(cid).json
       end
 
       def all_containers
-        raise "TODO: all_containers"
+        ::Docker::Container.all({:all => true}, @api).map(&:id)
       end
 
       def docker_bridge_ip
         raise "TODO: docker_bridge_ip"
+      end
+
+      private
+
+      def container(cid)
+        ::Docker::Container.get(cid, nil, @api)
       end
 
     end
