@@ -19,6 +19,10 @@ en:
       config:
         cmd_not_set: |-
           The Docker command has not been set!
+        invalid_driver: |-
+          The driver version must be one of :cli or :api.
+        socket_not_set: |-
+          The socket must be set to use the api driver.
 
   vagrant:
     errors:
